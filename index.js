@@ -49,9 +49,9 @@ const auth = Buffer.from(`${confluence_email}:${confluence_apiToken}`).toString(
  * @throws {Error} If the API request fails.
  */
 async function getPageByTitle(title) {
-  const url = `${confluence_url}/wiki/rest/api/content?title=${encodeURIComponent(
+  const url = `${confluence_domain_url}/wiki/rest/api/content?title=${encodeURIComponent(
     title
-  )}&spaceKey=${spaceKey}&expand=version`;
+  )}&spaceKey=${confluence_space_name}&expand=version`;
 
   const response = await fetch(url, {
     method: "GET",
