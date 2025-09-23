@@ -25,7 +25,7 @@ dotenv.config();
  * confluence_apiToken is the API token generated from Confluence for script authentication.
  * confluence_space_name represents the name of the Confluence space where pages will be created or updated.
  * confluence_page_id represents the ID of the parent page under which new pages will be created. useful for child pages
- * repository_name is the name of the repository, used for naming the pages appropriately.
+ * repository_name is the name of the repository, used for naming the pages appropriately and avoiding space naming conflicts.
  */
 
 const confluence_domain_url = process.env.CONFLUENCE_DOMAIN_URL;
@@ -49,9 +49,9 @@ const auth = Buffer.from(`${confluence_email}:${confluence_apiToken}`).toString(
  * @throws {Error} If the API request fails.
  */
 async function getPageByTitle(title) {
-  const url = `${confluence_domain_url}/wiki/rest/api/content?title=${encodeURIComponent(
+  const url = `${confluence_url}/wiki/rest/api/content?title=${encodeURIComponent(
     title
-  )}&spaceKey=${confluence_space_name}&expand=version,ancestors`;
+  )}&spaceKey=${spaceKey}&expand=version`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -66,17 +66,7 @@ async function getPageByTitle(title) {
   }
 
   const data = await response.json();
-  if (data.results && data.results.length > 0) {
-    // Filter by parent page ID (ancestor)
-    const match = data.results.find(
-      (page) =>
-        page.ancestors &&
-        page.ancestors.length > 0 &&
-        page.ancestors[page.ancestors.length - 1].id === confluence_page_id
-    );
-    return match || null;
-  }
-  return null;
+  return data.results && data.results.length > 0 ? data.results[0] : null;
 }
 
 /**
