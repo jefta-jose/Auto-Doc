@@ -169,13 +169,16 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
  * @returns {Promise<void>}
  */
 async function publishDocs() {
-  const readmePath = path.join(process.cwd(), file_path);
+  const resolvedPath = path.isAbsolute(file_path)
+    ? file_path
+    : path.join(process.cwd(), file_path);
 
-  if (!fs.existsSync(readmePath)) {
-    console.log(`No ${file_path} found at root, skipping.`);
+  if (!fs.existsSync(resolvedPath)) {
+    console.log(`No ${file_path} found, skipping.`);
     return;
   }
-  const markdown = fs.readFileSync(readmePath, "utf-8");
+  const markdown = fs.readFileSync(resolvedPath, "utf-8");
+
 
   const html = marked.parse(markdown);
 
