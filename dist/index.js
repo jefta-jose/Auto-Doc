@@ -28124,13 +28124,16 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
  * @returns {Promise<void>}
  */
 async function publishDocs() {
-  const readmePath = external_path_.join(process.cwd(), file_path);
+  const resolvedPath = external_path_.isAbsolute(file_path)
+    ? file_path
+    : external_path_.join(process.cwd(), file_path);
 
-  if (!external_fs_.existsSync(readmePath)) {
-    console.log(`No ${file_path} found at root, skipping.`);
+  if (!external_fs_.existsSync(resolvedPath)) {
+    console.log(`No ${file_path} found, skipping.`);
     return;
   }
-  const markdown = external_fs_.readFileSync(readmePath, "utf-8");
+  const markdown = external_fs_.readFileSync(resolvedPath, "utf-8");
+
 
   const html = d.parse(markdown);
 
