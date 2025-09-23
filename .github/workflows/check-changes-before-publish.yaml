@@ -17,7 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-
       - uses: dorny/paths-filter@v3        
         id: filter
         with:
@@ -25,4 +24,3 @@ jobs:
           filters: |
             publish_documentation:
               - 'README.md'
-              
