@@ -2,9 +2,6 @@ name: Publish Docs to Confluence
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   changes:
@@ -38,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm install dotenv fs marked node-fetch path
+          npm install dotenv fs marked node-fetch path
 
       - name: Publish docs to Confluence
         run: node index.js
