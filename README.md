@@ -57,3 +57,4 @@ npx cypress open --env "ROLE=adminCreds,ENV=development"
 To run tests slower:
 ```bash
 npx cypress open --env "ROLE=adminCreds, COMMAND_DELAY=7000"
+
