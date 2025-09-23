@@ -28019,6 +28019,7 @@ async function getPageByTitle(title) {
   });
 
   if (!response.ok) {
+    console.log(response, "response");
     throw new Error(`Failed to fetch page: ${response.status} ${response.statusText}`);
   }
 
@@ -28124,7 +28125,7 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
  */
 async function publishDocs() {
   const readmePath = external_path_.join(process.cwd(), file_path);
-  
+
   if (!external_fs_.existsSync(readmePath)) {
     console.log(`No ${file_path} found at root, skipping.`);
     return;
