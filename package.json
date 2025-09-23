@@ -19,6 +19,7 @@
   "homepage": "https://github.com/jefta-jose/Auto-Doc#readme",
   "description": "",
   "dependencies": {
+    "@actions/core": "^1.11.1",
     "dotenv": "^17.2.2",
     "marked": "^16.3.0"
   }
