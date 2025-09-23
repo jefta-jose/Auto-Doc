@@ -1,0 +1,13 @@
+name: "Check Changes Before Publishing"
+description: "Checks if README.md has changed and sets an output."
+inputs:
+  readme_path:
+    description: "Path to the README file"
+    required: true
+    default: "README.md"
+outputs:
+  publish_documentation:
+    description: "Whether to publish documentation"
+runs:
+  using: "node20"
+  main: "index.js"

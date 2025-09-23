@@ -10,7 +10,6 @@
 
 import fs from "fs";
 import path from "path";
-import fetch from "node-fetch";
 import { marked } from "marked";
 import dotenv from "dotenv";
 
@@ -109,7 +108,7 @@ async function createPage(title, htmlContent) {
   }
 
   const data = await response.json();
-  console.log(`✅ Page created: ${data._links.base}${data._links.webui}`);
+  console.log(`Page created: ${data._links.base}${data._links.webui}`);
 }
 
 /**
@@ -155,28 +154,32 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
   }
 
   const data = await response.json();
-  console.log(`♻️ Page updated: ${data._links.base}${data._links.webui}`);
+  console.log(`Page updated: ${data._links.base}${data._links.webui}`);
 }
 
 /**
  * @function publishDocs
  * @description The main function to find, process, and publish documentation files.
- * It reads all '.md' files from the 'docs' directory.
- * For each file, it checks if a corresponding Confluence page exists.
+ * It reads the README.md file from the root directory.
  * If a page exists, it updates it; otherwise, it creates a new one.
  * @returns {Promise<void>}
  */
 async function publishDocs() {
   const readmePath = path.join(process.cwd(), "README.md");
   if (!fs.existsSync(readmePath)) {
-    console.log("ℹ️ No README.md found at root, skipping.");
+    console.log("No README.md found at root, skipping.");
     return;
   }
   const markdown = fs.readFileSync(readmePath, "utf-8");
+
   const html = marked.parse(markdown);
+
   const title = `${repository_name}-MD`;
-  console.log(`📄 Processing \"${title}\"...`);
+
+  console.log(`Processing \"${title}\"...`);
+
   const existingPage = await getPageByTitle(title);
+
   if (existingPage) {
     await updatePage(existingPage.id, existingPage.version.number, title, html);
   } else {
@@ -185,6 +188,6 @@ async function publishDocs() {
 }
 
 publishDocs().catch((err) => {
-  console.error("❌ Workflow failed:", err);
+  console.error("Workflow failed:", err);
   process.exit(1);
 });
