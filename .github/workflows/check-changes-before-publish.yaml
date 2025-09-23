@@ -1,0 +1,27 @@
+name: Check Changes Before Publishing Mark Down To Confluence
+
+on:
+  workflow_call:
+    outputs:
+      publish_documentation:
+        description: "Whether to publish documentation"
+        value: ${{ jobs.check-change.outputs.publish_documentation }}
+
+jobs:
+  check-change:
+    runs-on: ubuntu-latest
+    outputs:
+      publish_documentation: ${{ steps.filter.outputs.publish_documentation }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+      - uses: dorny/paths-filter@v3        
+        id: filter
+        with:
+          base: ${{ github.head_ref || github.ref_name }}
+          filters: |
+            publish_documentation:
+              - 'README.md'

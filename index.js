@@ -158,30 +158,20 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
  * @returns {Promise<void>}
  */
 async function publishDocs() {
-  const docsDir = path.join(process.cwd(), "docs");
-
-  if (!fs.existsSync(docsDir)) {
-    console.log("ℹ️ No docs directory found, skipping.");
+  const readmePath = path.join(process.cwd(), "README.md");
+  if (!fs.existsSync(readmePath)) {
+    console.log("ℹ️ No README.md found at root, skipping.");
     return;
   }
-
-  const files = fs.readdirSync(docsDir).filter((f) => f.endsWith(".md"));
-
-  for (const file of files) {
-    const filePath = path.join(docsDir, file);
-    const markdown = fs.readFileSync(filePath, "utf-8");
-    const html = marked.parse(markdown);
-    const title = path.basename(file, ".md");
-    
-    console.log(`📄 Processing "${title}"...`);
-
-    const existingPage = await getPageByTitle(title);
-
-    if (existingPage) {
-      await updatePage(existingPage.id, existingPage.version.number, title, html);
-    } else {
-      await createPage(title, html);
-    }
+  const markdown = fs.readFileSync(readmePath, "utf-8");
+  const html = marked.parse(markdown);
+  const title = "README";
+  console.log(`📄 Processing \"${title}\"...`);
+  const existingPage = await getPageByTitle(title);
+  if (existingPage) {
+    await updatePage(existingPage.id, existingPage.version.number, title, html);
+  } else {
+    await createPage(title, html);
   }
 }
 

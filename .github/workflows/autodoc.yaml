@@ -4,40 +4,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      docs: ${{ steps.filter.outputs.docs }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Filter changed files
-        id: filter
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            docs:
-              - 'docs/**/*.md'
-
+  check-changes-before-publishing-markdown-to-confluence:
+    uses: ./.github/workflows/check-changes-before-publish.yaml
+    
   publish-docs:
-    needs: changes
-    if: needs.changes.outputs.docs == 'true'
+    needs: check-changes-before-publishing-markdown-to-confluence
     runs-on: ubuntu-latest
+
+    env:
+      publish_documentation: ${{ needs.check-changes-before-publishing-markdown-to-confluence.outputs.publish_documentation }}
 
     steps:
       - name: Checkout repo
+        if: env.publish_documentation == 'true'
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: env.publish_documentation == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
+        if: env.publish_documentation == 'true'
         run: |
           npm install dotenv fs marked node-fetch path
 
       - name: Publish docs to Confluence
+        if: env.publish_documentation == 'true'
         run: node index.js
         env:
           CONFLUENCE_DOMAIN_URL: ${{ secrets.CONFLUENCE_DOMAIN_URL }}
