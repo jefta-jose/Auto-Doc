@@ -30,7 +30,7 @@ dotenv.config();
 const confluence_domain_url = process.env.CONFLUENCE_DOMAIN_URL;
 const confluence_email = process.env.CONFLUENCE_EMAIL;
 const confluence_apiToken = process.env.CONFLUENCE_API_TOKEN;
-const confluence_space_name = process.env.CONFLUENCE_SPACE_KEY;
+const confluence_space_name = process.env.CONFLUENCE_SPACE_NAME;
 const confluence_page_id = process.env.CONFLUENCE_PARENT_PAGE_ID;
 const repository_name = process.env.REPOSITORY_NAME;
 
