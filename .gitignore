@@ -1,0 +1,4 @@
+# generate .gitignore boilerplate
+node_modules/
+.env
+.vscode/   

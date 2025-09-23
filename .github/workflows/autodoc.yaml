@@ -1,0 +1,50 @@
+name: Publish Docs to Confluence
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Filter changed files
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs:
+              - 'docs/**/*.md'
+
+  publish-docs:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          pnpm install dotenv fs marked node-fetch path
+
+      - name: Publish docs to Confluence
+        run: node index.js
+        env:
+          CONFLUENCE_DOMAIN_URL: secrets.CONFLUENCE_DOMAIN_URL
+          CONFLUENCE_EMAIL: secrets.CONFLUENCE_EMAIL
+          CONFLUENCE_API_TOKEN: secrets.CONFLUENCE_API_TOKEN
+          CONFLUENCE_SPACE_KEY: secrets.CONFLUENCE_SPACE_KEY
+          CONFLUENCE_PARENT_PAGE_ID: secrets.CONFLUENCE_PARENT_PAGE_ID
