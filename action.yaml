@@ -1,13 +1,10 @@
-name: "Check Changes Before Publishing"
-description: "Checks if README.md has changed and sets an output."
+name: "Publish Markdown to Confluence"
+description: "Publishes a Markdown file to Confluence"
 inputs:
-  readme_path:
-    description: "Path to the README file"
+  file_path:
+    description: "Path to the Markdown file to publish"
     required: true
     default: "README.md"
-outputs:
-  publish_documentation:
-    description: "Whether to publish documentation"
 runs:
   using: "node20"
   main: "index.js"

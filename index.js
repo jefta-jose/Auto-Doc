@@ -12,6 +12,7 @@ import fs from "fs";
 import path from "path";
 import { marked } from "marked";
 import dotenv from "dotenv";
+import core from "@actions/core";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ dotenv.config();
  * confluence_space_name represents the name of the Confluence space where pages will be created or updated.
  * confluence_page_id represents the ID of the parent page under which new pages will be created. useful for child pages
  * repository_name is the name of the repository, used for naming the pages appropriately and avoiding space naming conflicts.
+ * file_path is the path to the Markdown file to be published, defaulting to "README.md".
  */
 
 const confluence_domain_url = process.env.CONFLUENCE_DOMAIN_URL;
@@ -33,6 +35,7 @@ const confluence_apiToken = process.env.CONFLUENCE_API_TOKEN;
 const confluence_space_name = process.env.CONFLUENCE_SPACE_NAME;
 const confluence_page_id = process.env.CONFLUENCE_PARENT_PAGE_ID;
 const repository_name = process.env.REPOSITORY_NAME;
+const file_path = core.getInput("file_path") || "README.md";
 
 /**
  * @description Base64-encoded authentication string for Confluence API.
@@ -165,9 +168,10 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
  * @returns {Promise<void>}
  */
 async function publishDocs() {
-  const readmePath = path.join(process.cwd(), "README.md");
+  const readmePath = path.join(process.cwd(), file_path);
+  
   if (!fs.existsSync(readmePath)) {
-    console.log("No README.md found at root, skipping.");
+    console.log(`No ${file_path} found at root, skipping.`);
     return;
   }
   const markdown = fs.readFileSync(readmePath, "utf-8");
