@@ -1,6 +1,6 @@
 /**
  * @fileoverview This script automates the process of publishing Markdown documentation to Confluence.
- * It reads Markdown files from a 'docs' directory, converts them to HTML, and then either creates
+ * It reads Markdown files from the root directory, converts them to HTML, and then either creates
  * a new Confluence page or updates an existing one based on the file name.
  *
  * It's designed to be used in a CI/CD pipeline or as a standalone script for documentation management.
@@ -13,18 +13,27 @@ import path from "path";
 import fetch from "node-fetch";
 import { marked } from "marked";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 /**
  * @description Confluence API authentication and configuration.
- * Environment variables are used for security and flexibility.
+ * Environment variables are used for security and flexibility and are fetched from repository secrets.
  * @type {string}
+ * confluence_domain_url represents the organization's Confluence base URL.
+ * confluence_email is the email that was used to create the API token.
+ * confluence_apiToken is the API token generated from Confluence for script authentication.
+ * confluence_space_name represents the name of the Confluence space where pages will be created or updated.
+ * confluence_page_id represents the ID of the parent page under which new pages will be created. useful for child pages
+ * repository_name is the name of the repository, used for naming the pages appropriately.
  */
+
 const confluence_domain_url = process.env.CONFLUENCE_DOMAIN_URL;
 const confluence_email = process.env.CONFLUENCE_EMAIL;
 const confluence_apiToken = process.env.CONFLUENCE_API_TOKEN;
-const spaceKey = process.env.CONFLUENCE_SPACE_KEY;
-const parentPageId = process.env.CONFLUENCE_PARENT_PAGE_ID;
+const confluence_space_name = process.env.CONFLUENCE_SPACE_KEY;
+const confluence_page_id = process.env.CONFLUENCE_PARENT_PAGE_ID;
+const repository_name = process.env.REPOSITORY_NAME;
 
 /**
  * @description Base64-encoded authentication string for Confluence API.
@@ -42,7 +51,7 @@ const auth = Buffer.from(`${confluence_email}:${confluence_apiToken}`).toString(
 async function getPageByTitle(title) {
   const url = `${confluence_domain_url}/wiki/rest/api/content?title=${encodeURIComponent(
     title
-  )}&spaceKey=${spaceKey}&expand=version`;
+  )}&spaceKey=${confluence_space_name}&expand=version,ancestors`;
 
   const response = await fetch(url, {
     method: "GET",
@@ -57,7 +66,17 @@ async function getPageByTitle(title) {
   }
 
   const data = await response.json();
-  return data.results && data.results.length > 0 ? data.results[0] : null;
+  if (data.results && data.results.length > 0) {
+    // Filter by parent page ID (ancestor)
+    const match = data.results.find(
+      (page) =>
+        page.ancestors &&
+        page.ancestors.length > 0 &&
+        page.ancestors[page.ancestors.length - 1].id === confluence_page_id
+    );
+    return match || null;
+  }
+  return null;
 }
 
 /**
@@ -74,8 +93,8 @@ async function createPage(title, htmlContent) {
   const payload = {
     type: "page",
     title,
-    space: { key: spaceKey },
-    ancestors: parentPageId ? [{ id: parentPageId }] : undefined,
+    space: { key: confluence_space_name },
+    ancestors: confluence_page_id ? [{ id: confluence_page_id }] : undefined,
     body: {
       storage: {
         value: htmlContent,
@@ -120,7 +139,7 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
     id: pageId,
     type: "page",
     title,
-    space: { key: spaceKey },
+    space: { key: confluence_space_name },
     version: { number: currentVersion + 1 },
     body: {
       storage: {
@@ -165,7 +184,7 @@ async function publishDocs() {
   }
   const markdown = fs.readFileSync(readmePath, "utf-8");
   const html = marked.parse(markdown);
-  const title = "README";
+  const title = `${repository_name}-MD`;
   console.log(`📄 Processing \"${title}\"...`);
   const existingPage = await getPageByTitle(title);
   if (existingPage) {
