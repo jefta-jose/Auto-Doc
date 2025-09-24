@@ -1,5 +1,3 @@
-Here’s a polished `.md` file version of your content:
-
 ````markdown
 # md-confluence
 
