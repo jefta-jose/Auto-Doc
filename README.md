@@ -24,7 +24,7 @@ When integrated into a CI/CD pipeline, this tool can continuously sync Markdown 
 
 ### Inputs & Environment Variables
 
-Set the following environment variables (as **GitHub repository secrets** or in a local `.env` file):
+Set the following environment variables (as **GitHub repository secrets** or in a local `.env` file) in the consuming repository:
 
 | Variable                 | Description                                                      |
 |--------------------------|------------------------------------------------------------------|
