@@ -64,7 +64,6 @@ async function getPageByTitle(title) {
   });
 
   if (!response.ok) {
-    console.log(response, "response");
     throw new Error(`Failed to fetch page: ${response.status} ${response.statusText}`);
   }
 
@@ -164,7 +163,7 @@ async function updatePage(pageId, currentVersion, title, htmlContent) {
 /**
  * @function publishDocs
  * @description The main function to find, process, and publish documentation files.
- * It reads the README.md file from the root directory.
+ * It reads the README.md file from the provided directory in the ci-cd.
  * If a page exists, it updates it; otherwise, it creates a new one.
  * @returns {Promise<void>}
  */
@@ -177,8 +176,8 @@ async function publishDocs() {
     console.log(`No ${file_path} found, skipping.`);
     return;
   }
-  const markdown = fs.readFileSync(resolvedPath, "utf-8");
 
+  const markdown = fs.readFileSync(resolvedPath, "utf-8");
 
   const html = marked.parse(markdown);
 
