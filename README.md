@@ -1,4 +1,4 @@
-# md-confluence
+# MD-Confluence
 
 **md-confluence** is a reusable tool designed for **Amarok** to automate the creation and updating of Confluence documentation directly from Markdown files.  
 Its main purpose is to bridge the gap between code documentation maintained in Markdown (such as `README.md`) and Confluence.  
